@@ -529,7 +529,10 @@ void procesarMatrizB(const vector<vector<int>>& matrizA, const vector<vector<int
     cout << "\n >> Algoritmo BT sobre B" << endl;
     cout << "\n> Testores encontrados (" << testoresEncontradosB.size() << "):" << endl;
     imprimirTestores(testoresEncontradosB);
-    cout << "\n> Listas revisadas: " << listasRevisadasB << " de " << static_cast<long long>(pow(2,n)-1) << " posibles" << endl;
+    cout << "\n> Listas revisadas: " << listasRevisadasB << " de ";
+    if (n < 64) cout << ((1ULL << n) - 1);
+    else cout << "2^" << n << " - 1";
+    cout << " posibles" << endl;
     cout << "\n> Testores tipicos de B (" << testoresTipicosB.size() << "):" << endl;
     imprimirTestores(testoresTipicosB);
     cout << "\n> Tiempo de ejecucion total del BT sobre B: " << fixed << setprecision(6) << tiempoTotal << " ms" << endl;
@@ -662,7 +665,10 @@ int main() {
     if (opcionAlgoritmo == 2) {
         cout << "\n> Testores encontrados (" << testoresEncontrados.size() << "):" << endl;
         imprimirTestores(testoresEncontrados);
-        cout << "\n> Listas revisadas: " << listasRevisadas << " de " << pow(2,columnasMD)-1 << " posibles" << endl;
+        cout << "\n> Listas revisadas: " << listasRevisadas << " de ";
+        if (columnasMD < 64) cout << ((1ULL << columnasMD) - 1);
+        else cout << "2^" << columnasMD << " - 1";
+        cout << " posibles" << endl;
         cout << "\n> Testores tipicos (" << testoresTipicos.size() << "):" << endl;
         imprimirTestores(testoresTipicos);
     }
