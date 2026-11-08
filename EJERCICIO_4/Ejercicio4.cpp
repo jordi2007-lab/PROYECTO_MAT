@@ -597,7 +597,7 @@ int main() {
 
     }else{
         //Insertar manualmente
-        cout << "\nIngrese matriz A " << filasMD << "x" << columnasMD << ":" << endl;
+        cout << "\nIngrese matriz de " << filasMD << "x" << columnasMD << ":" << endl;
         
 		if (opcionMenu == 2) {
             //Opcion 2 Fila por fila
