@@ -37,15 +37,9 @@ PROYECTO_MAT/
 
 Se requiere un compilador de C++ compatible con C++11 o superior.
 
-Los programas se desarrollaron y ejecutaron en **Visual Studio Code** (extensión C/C++ de Microsoft) con el compilador **GCC de MSYS2 (UCRT64)**, usando el botón *Run* de la extensión. Ese botón compila con la tarea predeterminada, equivalente a:
+### Cómo compilar y ejecutar
 
-```bash
-g++ -fdiagnostics-color=always -g Ejercicio2.cpp -o Ejercicio2.exe
-```
-
-Es decir, sin opciones de optimización, y el programa se ejecuta bajo el depurador `gdb`. Los tiempos reportados en el informe se obtuvieron en estas condiciones.
-
-Para compilar y ejecutar desde una terminal, dentro de la carpeta de cada ejercicio:
+Desde la carpeta raíz del repositorio, entrar a la carpeta del ejercicio, compilar y ejecutar:
 
 ```bash
 cd EJERCICIO_2
@@ -53,7 +47,11 @@ g++ -g Ejercicio2.cpp -o Ejercicio2.exe
 ./Ejercicio2.exe
 ```
 
-y de forma análoga para los demás ejercicios.
+y de forma análoga para los demás ejercicios. Si `g++` no se reconoce como comando, usar la ruta completa del compilador (por ejemplo `C:\msys64\ucrt64\bin\g++.exe`).
+
+### Condiciones en que se midieron los tiempos del informe
+
+Los programas se desarrollaron y ejecutaron en **Visual Studio Code** (extensión C/C++ de Microsoft) con **GCC 16.2.0 de MSYS2 (UCRT64)**, usando el botón *Run* de la extensión. Ese botón compila con la opción `-g`, **sin optimización**, y ejecuta el programa bajo el depurador `gdb`. Los tiempos reportados en el informe se obtuvieron en estas condiciones. El comando de la sección anterior compila el programa con las mismas opciones.
 
 ## Uso del Ejercicio 2
 
