@@ -35,21 +35,25 @@ PROYECTO_MAT/
 
 ## Compilación y ejecución
 
-Se requiere un compilador de C++ compatible con C++11 o superior (se usó GCC). Cada programa se compila y ejecuta dentro de su carpeta:
+Se requiere un compilador de C++ compatible con C++11 o superior.
+
+Los programas se desarrollaron y ejecutaron en **Visual Studio Code** (extensión C/C++ de Microsoft) con el compilador **GCC de MSYS2 (UCRT64)**, usando el botón *Run* de la extensión. Ese botón compila con la tarea predeterminada, equivalente a:
 
 ```bash
-cd EJERCICIO_1
-g++ -std=c++11 Ejercicio1.cpp -o Ejercicio1
-./Ejercicio1
+g++ -fdiagnostics-color=always -g Ejercicio2.cpp -o Ejercicio2.exe
 ```
+
+Es decir, sin opciones de optimización, y el programa se ejecuta bajo el depurador `gdb`. Los tiempos reportados en el informe se obtuvieron en estas condiciones.
+
+Para compilar y ejecutar desde una terminal, dentro de la carpeta de cada ejercicio:
 
 ```bash
 cd EJERCICIO_2
-g++ -std=c++11 Ejercicio2.cpp -o Ejercicio2
-./Ejercicio2
+g++ -g Ejercicio2.cpp -o Ejercicio2.exe
+./Ejercicio2.exe
 ```
 
-En Windows el ejecutable es `Ejercicio1.exe` / `Ejercicio2.exe`. También pueden compilarse desde Dev-C++ u otro IDE.
+y de forma análoga para los demás ejercicios.
 
 ## Uso del Ejercicio 2
 
