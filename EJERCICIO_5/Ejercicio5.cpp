@@ -21,7 +21,7 @@ const int MaximoGamma = 4;
 //Tiempo total
 double tiempoTotal = 0;
 
-//Limite de tiempo de BT en el experimento (ms), si la ultima ejecucion se detuvo y cuantas listas reviso
+//Ejercicio 5: limite de tiempo de BT (ms), si la ultima ejecucion se detuvo y cuantas listas reviso
 const double LimiteBT_ms = 60000;
 bool ejecucionCortada = false;
 long long listasUltimaEjecucion = 0;
@@ -199,36 +199,44 @@ void registrarFila(int fila, const vector<vector<int>>& testoresTipicos, double 
     cout << "\nFila " << fila << ":" << endl;
     cout << "Testores encontrados:" << endl;
     imprimirTestores(testoresTipicos);
-    cout << "\n> Tiempo de ejecucion acumulado: " << fixed << setprecision(4) << tiempoAcumulado << " ms" << endl;
+    cout << "\n> Tiempo de ejecucion acumulado: " << fixed << setprecision(6) << tiempoAcumulado << " ms" << endl;
 }
 
-//Funcion de soporte
-bool FindCompatibleSet(const vector<vector<int>>& MB, const vector<int>& colsSeleccionadas, int nuevaColumna, int filaActual) {
+//Busqueda del conjunto compatible (Algoritmo 2 de YYC), igual que en Ejercicio2.cpp:
+//recorre las filas 0..filaActual; cada fila con un unico 1 dentro de S se cuenta
+//y marca la columna donde esta ese 1. Condicion 1: filas con suma 1 >= |S|.
+//Condicion 2: todas las columnas de S quedan marcadas.
+bool FindCompatibleSet(const vector<vector<int>>& MB, const vector<int>& tau, int nuevaColumna, int filaActual) {
+    vector<int> S = tau;
+    S.push_back(nuevaColumna);
 
-    vector<int> colsRef = colsSeleccionadas;
-    colsRef.push_back(nuevaColumna);
+    vector<bool> marcada(S.size(), false);
+    int filasConSumaUno = 0;
 
-    for (int c : colsRef) {
-        bool tieneFilaPropia = false;
-
-        for (int i=0; i<=filaActual; i++) {
-            if (MB[i][c] != 1) continue;
-
-            //Contar los 1 de la fila
-            int sumaFila = 0;
-            for (int col : colsRef) {
-                if (MB[i][col] == 1) sumaFila++;
-            }
-
-            if (sumaFila == 1) {
-                tieneFilaPropia = true;
-                break;
+    for (int k=0; k<=filaActual; k++) {
+        int sumaFila = 0;
+        int posicionUno = -1;
+        for (size_t c=0; c<S.size(); c++) {
+            if (MB[k][S[c]] == 1) {
+                sumaFila++;
+                posicionUno = c;
             }
         }
-        if (!tieneFilaPropia) return false;
+        if (sumaFila == 1) {
+            filasConSumaUno++;
+            marcada[posicionUno] = true;
+        }
     }
 
-    return true;
+    bool condicion1 = filasConSumaUno >= static_cast<int>(S.size());
+    bool condicion2 = true;
+    for (bool m : marcada) {
+        if (!m) {
+            condicion2 = false;
+            break;
+        }
+    }
+    return condicion1 and condicion2;
 }
 
 //Obtener el conjunto de testores típicos de una matriz basica con el algoritmo YYC
@@ -283,9 +291,6 @@ vector<vector<int>> calcularTestoresTipicosYYC(const vector<vector<int>>& MB, ve
                 }
             }
         }
-        //Ordenar y borrar testores repetidos
-        sort(nuevosTestores.begin(), nuevosTestores.end());
-        nuevosTestores.erase(unique(nuevosTestores.begin(), nuevosTestores.end()), nuevosTestores.end());
         testoresTipicos = nuevosTestores;
 
         //Fin del cronómetro para la fila
@@ -313,7 +318,7 @@ string testorATexto(const vector<int>& testor) {
 //Imprimir la tabla de resultados
 void imprimirTabla(const vector<vector<vector<int>>>& historial, const vector<double>& tiempos) {
     for (size_t i=0; i<historial.size(); i++) {
-        cout << left << setw(6) << i+1 << fixed << setprecision(4) << tiempos[i] << " ms" << endl;
+        cout << left << setw(6) << i+1 << fixed << setprecision(6) << tiempos[i] << " ms" << endl;
 
         cout << "      ";
         if (historial[i].empty()) cout << "---";
@@ -403,13 +408,19 @@ vector<vector<int>> calcularTestoresTipicosBT(const vector<vector<int>>& MB, vec
     //Cuantos se revisaron
     listasRevisadas = 0;
     tiempoTotal = 0;
+    ejecucionCortada = false;
+
+    //El cronometro incluye la revision de filas de ceros, como en los Ejercicios 3 y 4
+    auto inicioCronometro = chrono::high_resolution_clock::now();
 
     //Si hay una fila de ceros no hay testores
     for (int i=0; i<m; i++) {
-        if (posicionUltimoUno(MB[i]) == 0) return testoresTipicos;
+        if (posicionUltimoUno(MB[i]) == 0) {
+            chrono::duration<double, milli> duracion = chrono::high_resolution_clock::now() - inicioCronometro;
+            tiempoTotal = duracion.count();
+            return testoresTipicos;
+        }
     }
-
-    auto inicioCronometro = chrono::high_resolution_clock::now();
 
     //Primera lista (0,...,0,1)
     vector<int> alpha(n, 0);
@@ -417,6 +428,14 @@ vector<vector<int>> calcularTestoresTipicosBT(const vector<vector<int>>& MB, vec
 
     bool hayMasListas = true;
     while (hayMasListas) {
+        //Limite de tiempo del Ejercicio 5 (se revisa cada 2^16 listas)
+        if (listasRevisadas > 0 and (listasRevisadas & 0xFFFF) == 0) {
+            chrono::duration<double, milli> t = chrono::high_resolution_clock::now() - inicioCronometro;
+            if (t.count() > LimiteBT_ms) {
+                ejecucionCortada = true;
+                break;
+            }
+        }
         listasRevisadas++;
 
         //Revisar si alpha es lista testor
@@ -443,108 +462,6 @@ vector<vector<int>> calcularTestoresTipicosBT(const vector<vector<int>>& MB, vec
         } else {
             //1.5
             saltoNoTestor(alpha, posicionUltimoUno(MB[fila]));
-        }
-    }
-
-    //Ordenar para que salgan en el mismo orden que en YYC
-    sort(testoresTipicos.begin(), testoresTipicos.end());
-
-    auto finCronometro = chrono::high_resolution_clock::now();
-    chrono::duration<double, milli> duracion = finCronometro - inicioCronometro;
-    tiempoTotal += duracion.count();
-
-    return testoresTipicos;
-}
-
-// > BT con bits (Ejercicio 5)
-// ================================================
-//Mismo recorrido y mismos saltos 1.4 y 1.5 que calcularTestoresTipicosBT, pero cada lista
-//y cada fila se guardan como un numero de 128 bits (x1 = bit mas significativo, asi el orden
-//natural es el orden numerico). Sirve para matrices de hasta 127 columnas.
-typedef unsigned __int128 bits128;
-
-//Cantidad de ceros al final de x (posicion k del ultimo 1 = n - ceros)
-int cerosFinales(bits128 x) {
-    unsigned long long bajo = (unsigned long long)x;
-    if (bajo != 0) return __builtin_ctzll(bajo);
-    return 64 + __builtin_ctzll((unsigned long long)(x >> 64));
-}
-
-//Cantidad de unos de x
-int contarBits(bits128 x) {
-    return __builtin_popcountll((unsigned long long)x) + __builtin_popcountll((unsigned long long)(x >> 64));
-}
-
-vector<vector<int>> calcularTestoresTipicosBTBits(const vector<vector<int>>& MB, long long& listasRevisadas) {
-    int m = MB.size();
-    int n = MB[0].size();
-
-    vector<vector<int>> testoresTipicos;
-    listasRevisadas = 0;
-    tiempoTotal = 0;
-    ejecucionCortada = false;
-
-    //Si hay una fila de ceros no hay testores
-    for (int i=0; i<m; i++) {
-        if (posicionUltimoUno(MB[i]) == 0) return testoresTipicos;
-    }
-
-    auto inicioCronometro = chrono::high_resolution_clock::now();
-
-    //Filas como numeros y ceros finales de cada fila (equivale a su k)
-    vector<bits128> filas(m, 0);
-    vector<int> ceros(m);
-    for (int i=0; i<m; i++) {
-        for (int j=0; j<n; j++) {
-            if (MB[i][j] == 1) filas[i] |= (bits128)1 << (n-1-j);
-        }
-        ceros[i] = cerosFinales(filas[i]);
-    }
-
-    //Primera lista (0,...,0,1); el recorrido termina al pasar de (1,...,1)
-    bits128 alpha = 1;
-    bits128 fin = (bits128)1 << n;
-
-    while (alpha < fin) {
-        listasRevisadas++;
-
-        //Limite de tiempo (se revisa cada 2^20 listas)
-        if ((listasRevisadas & 0xFFFFF) == 0) {
-            chrono::duration<double, milli> t = chrono::high_resolution_clock::now() - inicioCronometro;
-            if (t.count() > LimiteBT_ms) {
-                ejecucionCortada = true;
-                break;
-            }
-        }
-
-        //Fila nula con menor k (la de mas ceros finales)
-        int mejorCeros = -1;
-        for (int i=0; i<m; i++) {
-            if ((filas[i] & alpha) == 0 and ceros[i] > mejorCeros) mejorCeros = ceros[i];
-        }
-
-        if (mejorCeros == -1) {
-            //Es testor; es tipico si cada columna tiene una fila con un unico 1 dentro de alpha
-            bits128 marcadas = 0;
-            for (int i=0; i<m; i++) {
-                bits128 x = filas[i] & alpha;
-                if (contarBits(x) == 1) marcadas |= x;
-            }
-            if (marcadas == alpha) {
-                vector<int> columnas;
-                for (int j=0; j<n; j++) {
-                    if ((alpha >> (n-1-j)) & 1) columnas.push_back(j);
-                }
-                testoresTipicos.push_back(columnas);
-            }
-
-            //1.4: sumar 1 en la posicion del ultimo 1 de alpha
-            alpha += alpha & (~alpha + 1);
-
-        } else {
-            //1.5: poner 1 en la posicion k de la fila y ceros despues
-            bits128 b = (bits128)1 << mejorCeros;
-            alpha = (alpha & ~(b - 1)) | b;
         }
     }
 
@@ -612,10 +529,13 @@ void analizarMatrizB(const vector<vector<int>>& matrizA, const vector<vector<int
     cout << "\n >> Algoritmo BT sobre B" << endl;
     cout << "\n> Testores encontrados (" << testoresEncontradosB.size() << "):" << endl;
     imprimirTestores(testoresEncontradosB);
-    cout << "\n> Listas revisadas: " << listasRevisadasB << " de " << static_cast<long long>(pow(2,n)-1) << " posibles" << endl;
+    cout << "\n> Listas revisadas: " << listasRevisadasB << " de ";
+    if (n < 64) cout << ((1ULL << n) - 1);
+    else cout << "2^" << n << " - 1";
+    cout << " posibles" << endl;
     cout << "\n> Testores tipicos de B (" << testoresTipicosB.size() << "):" << endl;
     imprimirTestores(testoresTipicosB);
-    cout << "\n> Tiempo de ejecucion total del BT sobre B: " << fixed << setprecision(4) << tiempoTotal << " ms" << endl;
+    cout << "\n> Tiempo de ejecucion total del BT sobre B: " << fixed << setprecision(6) << tiempoTotal << " ms" << endl;
 
     //Comparar A y B
     vector<vector<int>> filasBasicaA = filasATestores(matrizBasicaA);
@@ -743,7 +663,6 @@ double medirAlgoritmo(const vector<vector<int>>& MB, int algoritmo, long long& c
     ejecucionCortada = false;
     cout.setstate(ios::badbit);
     if (algoritmo == 1) testores = calcularTestoresTipicosYYC(MB, historial, tiempos);
-    else if (MB[0].size() < 128) testores = calcularTestoresTipicosBTBits(MB, listasRevisadas);
     else testores = calcularTestoresTipicosBT(MB, testoresEncontrados, listasRevisadas);
     cout.clear();
     listasUltimaEjecucion = listasRevisadas;
@@ -760,7 +679,7 @@ void imprimirTiempoTabla(double tiempo, int ancho) {
 
 //Imprimir el encabezado de la tabla
 void imprimirEncabezadoExperimento() {
-    cout << left << fixed << setprecision(4);
+    cout << left << fixed << setprecision(6);
     cout << setw(4) << "N" << setw(24) << "Matriz" << setw(8) << "Filas" << setw(10) << "Columnas" << setw(12) << "Testores"
          << setw(18) << "YYC original" << setw(18) << "YYC ascendente" << setw(18) << "BT original" << setw(18) << "BT ascen" << endl;
     cout << string(120, '-') << endl;
@@ -788,7 +707,7 @@ void imprimirFilaExperimento(int N, const string& nombre, const vector<vector<in
     cout << left << setw(4) << N << setw(24) << nombre << setw(8) << matriz.size() << setw(10) << matriz[0].size() << setw(12) << esperados;
 
     for (int k=0; k<4; k++){
-    	if (cortada[k]) cout << setw(18) << "> " + to_string((int)(LimiteBT_ms/1000)) + " s";
+    	if (cortada[k]) cout << setw(18) << "-";
     	else imprimirTiempoTabla(tiemposEjecucion[k], 18);
 	}
     cout << endl;
@@ -844,7 +763,8 @@ void experimentoOperadores(const vector<vector<int>>& matrizBasicaA, const vecto
         imprimirFilaExperimento(N, "gamma^" + to_string(N) + "(theta(A,B))", potenciaGamma(matrizTheta, N), testoresGamma(testoresTheta, N), conteoCorrecto);
     }
 
-    cout << "\nLos testores encontrados coinciden con los esperados (ejecuciones terminadas): " << (conteoCorrecto ? "Si" : "No") << endl;
+    cout << "\n'-': BT se detuvo al superar el limite de " << static_cast<int>(LimiteBT_ms/1000) << " s" << endl;
+    cout << "Los testores encontrados coinciden con los esperados (ejecuciones terminadas): " << (conteoCorrecto ? "Si" : "No") << endl;
 }
 
 
@@ -955,12 +875,15 @@ int main() {
     if (opcionAlgoritmo == 2) {
         cout << "\n> Testores encontrados (" << testoresEncontrados.size() << "):" << endl;
         imprimirTestores(testoresEncontrados);
-        cout << "\n> Listas revisadas: " << listasRevisadas << " de " << pow(2,columnasMD)-1 << " posibles" << endl;
+        cout << "\n> Listas revisadas: " << listasRevisadas << " de ";
+        if (columnasMD < 64) cout << ((1ULL << columnasMD) - 1);
+        else cout << "2^" << columnasMD << " - 1";
+        cout << " posibles" << endl;
         cout << "\n> Testores tipicos (" << testoresTipicos.size() << "):" << endl;
         imprimirTestores(testoresTipicos);
     }
 
-    cout << "\n> Tiempo de ejecucion total del " << (opcionAlgoritmo == 1 ? "YYC" : "BT") << ": " << fixed << setprecision(4) << tiempoTotal << " ms" << endl;
+    cout << "\n> Tiempo de ejecucion total del " << (opcionAlgoritmo == 1 ? "YYC" : "BT") << ": " << fixed << setprecision(6) << tiempoTotal << " ms" << endl;
 
     //Construir B
     cout << "\nConstruir la matriz B con los testores tipicos de A?" << endl;
