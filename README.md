@@ -1,15 +1,13 @@
-# Proyecto: Algoritmos para el cálculo de todos los testores típicos de una matriz básica
+# Algoritmos para el cálculo de todos los testores típicos de una matriz básica
 
-Matemáticas Discretas (MAT 2004) – Semestre 202610 – Universidad San Francisco de Quito USFQ
-Profesor: Eduardo Alba
+Matemáticas Discretas (MAT 2004), semestre 202610, Universidad San Francisco de Quito USFQ.
+Profesor: Eduardo Alba Cabrera.
 
 Integrantes:
-- Jordi Yungan – 00346350
-- Miguel Carrera – 00343860
+- Jordi Yungan (00346350)
+- Miguel Carrera (00343860)
 
 ## Estructura del repositorio
-
-Cada ejercicio tiene su propia carpeta con su código fuente:
 
 ```
 PROYECTO_MAT/
@@ -17,29 +15,34 @@ PROYECTO_MAT/
 │   └── Ejercicio1.cpp
 ├── EJERCICIO_2/
 │   ├── Ejercicio2.cpp
-│   └── matrizA.txt
+│   └── matrizA
 ├── EJERCICIO_3/
+│   └── Ejercicio3.cpp
 ├── EJERCICIO_4/
+│   ├── Ejercicio4.cpp
+│   └── matrizB
 ├── EJERCICIO_5/
+│   └── Ejercicio5.cpp
 └── README.md
 ```
 
-| Carpeta | Archivos | Descripción |
-|---|---|---|
-| `EJERCICIO_1` | `Ejercicio1.cpp` | Genera una matriz booleana aleatoria de m × n, calcula su matriz básica y la densidad de esta. |
-| `EJERCICIO_2` | `Ejercicio2.cpp` | Genera la matriz básica A (n ≥ 7, densidad ≥ 0.4) y la guarda en un archivo, o permite ingresar una matriz fila por fila. Aplica YYC y muestra, tras cada fila, los testores típicos identificados y el tiempo acumulado. |
-| `EJERCICIO_2` | `matrizA.txt` | Matriz básica A usada en el reporte (4 × 7, densidad 3/7). Se usa también en los Ejercicios 3 a 5. |
-| `EJERCICIO_3` | *Pendiente* | Algoritmo BT. |
-| `EJERCICIO_4` | *Pendiente* | Matriz B de testores típicos de A. |
-| `EJERCICIO_5` | *Pendiente* | Operadores φ, θ, γ y experimentos. |
+| Archivo | Descripción |
+|---|---|
+| `Ejercicio1.cpp` | Genera una matriz booleana aleatoria, calcula su matriz básica y la densidad de esta. |
+| `Ejercicio2.cpp` | Genera la matriz básica A (n ≥ 7, densidad ≥ 0.4) o permite ingresar una matriz, y aplica YYC. |
+| `matrizA` | Matriz básica A usada en el reporte (4 × 7). |
+| `Ejercicio3.cpp` | Aplica BT o YYC a una matriz generada o ingresada. |
+| `Ejercicio4.cpp` | Construye la matriz B con los testores típicos de A, le aplica BT y compara A y B. |
+| `matrizB` | Matriz B usada en el reporte (8 × 7). |
+| `Ejercicio5.cpp` | Implementa los operadores φ, θ y γ, genera las matrices de prueba y mide los tiempos de YYC y BT. |
+
+Los archivos `matrizA` y `matrizB` tienen el número de filas y columnas en la primera línea y después una fila por línea, con los valores separados por espacios. Los programas no los leen directamente: las filas se escriben en el menú de ingreso.
 
 ## Compilación y ejecución
 
-Se requiere un compilador de C++ compatible con C++11 o superior.
+Se requiere un compilador de C++11 o superior (se usó GCC 16.2.0 de MSYS2 UCRT64).
 
-### Cómo compilar y ejecutar
-
-Desde la carpeta raíz del repositorio, entrar a la carpeta del ejercicio, compilar y ejecutar:
+Ejercicios 1 a 4 (ejemplo con el 2):
 
 ```bash
 cd EJERCICIO_2
@@ -47,31 +50,53 @@ g++ -g Ejercicio2.cpp -o Ejercicio2.exe
 ./Ejercicio2.exe
 ```
 
-y de forma análoga para los demás ejercicios. Si `g++` no se reconoce como comando, usar la ruta completa del compilador (por ejemplo `C:\msys64\ucrt64\bin\g++.exe`).
+Ejercicio 5 (con optimización y fuera del depurador, porque tarda varios minutos):
 
-### Condiciones en que se midieron los tiempos del reporte
-
-Los programas se desarrollaron y ejecutaron en **Visual Studio Code** (extensión C/C++ de Microsoft) con **GCC 16.2.0 de MSYS2 (UCRT64)**, usando el botón *Run* de la extensión. Ese botón compila con la opción `-g`, **sin optimización**, y ejecuta el programa bajo el depurador `gdb`. Los tiempos reportados en el reporte se obtuvieron en estas condiciones. El comando de la sección anterior compila el programa con las mismas opciones.
-
-## Uso del Ejercicio 2
-
-Al iniciar, el programa muestra un menú:
-
-1. **Generar matriz A:** se ingresan m y n (n ≥ 7). El programa repite la generación hasta que la matriz básica tenga densidad ≥ 0.4, pide un nombre de archivo y la guarda. Después aplica YYC.
-2. **Ingresar matriz manualmente:** se ingresan m y n, y luego cada fila con 0 y 1 (con o sin espacios). El programa calcula la matriz básica y aplica YYC.
-
-La semilla del generador aleatorio no es fija, así que cada ejecución de la opción 1 produce otra matriz. Para reproducir los resultados del reporte, use la opción 2 y copie las filas de `EJERCICIO_2/matrizA.txt` (sin la primera línea).
-
-## Formato de `matrizA.txt`
-
-La primera línea contiene el número de filas y de columnas; después va una fila de la matriz por línea, con los valores separados por espacios:
-
-```
-4 7
-0 1 1 0 0 0 0
-0 1 0 0 0 1 1
-1 0 0 1 1 0 1
-0 0 0 0 1 1 1
+```bash
+cd EJERCICIO_5
+g++ -O2 Ejercicio5.cpp -o Ejercicio5.exe
+./Ejercicio5.exe
 ```
 
-El programa guarda el archivo en la carpeta desde donde se ejecuta y con el nombre exacto que se escriba; no agrega la extensión `.txt`. Si se ejecuta desde `EJERCICIO_2`, el archivo queda en esa carpeta.
+Si `g++` no se reconoce como comando, use la ruta completa del compilador (por ejemplo `C:\msys64\ucrt64\bin\g++.exe`).
+
+## Uso
+
+**Ejercicio 1.** Se ingresan m y n. El programa no valida la entrada.
+
+**Ejercicio 2.** Menú:
+1. Generar A: se ingresan m y n (n ≥ 7). El programa repite la generación, sin límite de intentos, hasta que la matriz básica tenga densidad ≥ 0.4. Después pide un nombre de archivo y guarda la matriz.
+2. Ingresar una matriz fila por fila, con o sin espacios.
+
+**Ejercicio 3.** Menú:
+1. Generar una matriz aleatoria, con un máximo de 1000 intentos.
+2. Ingresar una matriz fila por fila, **sin espacios**.
+
+Después se elige el algoritmo: `1` para YYC o `2` para BT.
+
+**Ejercicio 4.** Tiene las opciones del Ejercicio 3 y una tercera para ingresar toda la matriz en una sola línea, con espacios permitidos. Después de aplicar el algoritmo, pregunta si se desea construir B; si se acepta, pide un nombre de archivo para guardarla.
+
+**Ejercicio 5.** Tiene el mismo menú que el Ejercicio 4. Al final pregunta si se desean generar las matrices de prueba. En las matrices de prueba, BT se detiene si supera los 60 s y en la tabla aparece `-`. Una ejecución completa tarda unos 10 minutos.
+
+> En los Ejercicios 3 a 5, las filas ingresadas no se validan: todo carácter distinto de `0` se lee como `1`. Por eso las filas deben escribirse sin espacios (o usar la opción 3 en los Ejercicios 4 y 5).
+
+## Reproducir los resultados del reporte
+
+Ejercicio 5, con las filas de `matrizA`:
+
+```
+2
+4
+7
+0110000
+0100011
+1001101
+0000111
+2
+1
+1
+```
+
+Con estas respuestas se elige el ingreso fila por fila (`2`), m = 4, n = 7, las cuatro filas de A, el algoritmo BT (`2`), la construcción de B (`1`) y la generación de las matrices de prueba (`1`). Hay que elegir BT: con YYC, las filas de B quedan en otro orden y los tiempos pueden cambiar.
+
+En los Ejercicios 3 y 4 se usan las mismas cuatro primeras respuestas y las mismas filas.
