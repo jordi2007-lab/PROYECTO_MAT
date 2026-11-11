@@ -62,7 +62,7 @@ Si `g++` no se reconoce como comando, use la ruta completa del compilador (por e
 
 ## Uso
 
-**Ejercicio 1.** Se ingresan m y n. El programa no valida la entrada.
+**Ejercicio 1.** Se ingresan m y n.
 
 **Ejercicio 2.** Menú:
 1. Generar A: se ingresan m y n (n ≥ 7). El programa repite la generación, sin límite de intentos, hasta que la matriz básica tenga densidad ≥ 0.4. Después pide un nombre de archivo y guarda la matriz.
