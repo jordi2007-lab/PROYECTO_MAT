@@ -79,24 +79,3 @@ Después se elige el algoritmo: `1` para YYC o `2` para BT.
 **Ejercicio 5.** Tiene el mismo menú que el Ejercicio 4. Al final pregunta si se desean generar las matrices de prueba. En las matrices de prueba, BT se detiene si supera los 60 s y en la tabla aparece `-`. Una ejecución completa tarda unos 10 minutos.
 
 > En los Ejercicios 3 a 5, las filas ingresadas no se validan: todo carácter distinto de `0` se lee como `1`. Por eso las filas deben escribirse sin espacios (o usar la opción 3 en los Ejercicios 4 y 5).
-
-## Reproducir los resultados del reporte
-
-Ejercicio 5, con las filas de `matrizA`:
-
-```
-2
-4
-7
-0110000
-0100011
-1001101
-0000111
-2
-1
-1
-```
-
-Con estas respuestas se elige el ingreso fila por fila (`2`), m = 4, n = 7, las cuatro filas de A, el algoritmo BT (`2`), la construcción de B (`1`) y la generación de las matrices de prueba (`1`). Hay que elegir BT: con YYC, las filas de B quedan en otro orden y los tiempos pueden cambiar.
-
-En los Ejercicios 3 y 4 se usan las mismas cuatro primeras respuestas y las mismas filas.
